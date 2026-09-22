@@ -1,0 +1,52 @@
+# CodeQL advanced setup.
+#
+# Used instead of the *default* setup, which skips a pull request that touches
+# no file of the configured languages. A docs-only PR would then have no
+# analysis to compare against `master`, and a `code_scanning` branch rule
+# reports "configurations not found".
+#
+# With no path filter, both configurations exist on every pull request. The
+# categories (`/language:actions`, `/language:rust`) must match on both sides.
+name: CodeQL
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  schedule:
+    # Weekly, to catch newly published queries against unchanged code.
+    - cron: '27 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # upload the SARIF results
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ actions, rust ]
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        with:
+          languages: ${{ matrix.language }}
+          # Neither language needs a compiled build for CodeQL to extract it.
+          build-mode: none
+          queries: security-extended
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        with:
+          category: "/language:${{ matrix.language }}"

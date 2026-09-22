@@ -1,0 +1,17 @@
+/target
+.claude
+CLAUDE.md
+/dist
+/reference
+/notes
+
+# MkDocs
+/site
+/.venv
+__pycache__/
+
+# Real SMTP credentials (examples/smtp.ini.example is the template)
+smtp.ini
+
+# Plugin output
+logs/

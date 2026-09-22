@@ -1,0 +1,131 @@
+site_name: email_samp
+site_description: SMTP mail plugin for SA-MP and Open Multiplayer, written in Rust
+site_author: NullSablex
+site_url: https://nullsablex.github.io/email-samp/
+
+repo_name: NullSablex/email-samp
+repo_url: https://github.com/NullSablex/email-samp
+edit_uri: edit/master/docs/
+
+docs_dir: docs
+
+# Python requirements for building this site: not pages.
+exclude_docs: |
+  requirements.in
+  requirements.txt
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.tracking
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.action.edit
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep orange
+      accent: orange
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep orange
+      accent: orange
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+
+plugins:
+  - search:
+      lang:
+        - en
+        - pt
+  # Every page exists twice: page.md in English and page.pt.md in Portuguese.
+  # A page with no translation falls back to the English one.
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      languages:
+        - locale: en
+          name: English
+          default: true
+          build: true
+        - locale: pt
+          name: Portugues (Brasil)
+          build: true
+          site_name: email_samp
+          nav_translations:
+            Home: Inicio
+            Installation: Instalacao
+            Guide: Guia
+            Configuration: Configuracao
+            Sending: Envio
+            Templates: Modelos
+            Errors: Erros
+            Security: Seguranca
+            Reference: Referencia
+            API reference: Referencia da API
+            Building from source: Compilando do codigo
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      permalink_title: Permanent link
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Guide:
+      - Configuration: configuration.md
+      - Sending: sending.md
+      - Templates: templates.md
+      - Errors: errors.md
+      - Security: security.md
+  - Reference:
+      - API reference: api-reference.md
+      - Building from source: building.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/NullSablex/email-samp
