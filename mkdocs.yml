@@ -1,7 +1,7 @@
 site_name: email_samp
 site_description: SMTP mail plugin for SA-MP and Open Multiplayer, written in Rust
 site_author: NullSablex
-site_url: https://nullsablex.github.io/email-samp/
+site_url: https://email-samp.nullsablex.com/
 
 repo_name: NullSablex/email-samp
 repo_url: https://github.com/NullSablex/email-samp
