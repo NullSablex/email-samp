@@ -34,8 +34,9 @@ SendWelcome(playerid, const address[])
     email_set_template(msg, "templates/welcome.tpl");
     email_set_var(msg, "name", name);
     email_set_var(msg, "server", "Los Santos RP");
-    // One call for any kind of value: text as written, or a format for
-    // numbers - "%d" for an integer or a bool, "%.2f" for decimals.
+    // Text goes as written. A number needs "%d" only because Pawn cannot
+    // pass one where a string is expected - it formats nothing, the value
+    // becomes text either way. "%.2f" is different: it decides the decimals.
     email_set_var(msg, "slots", "%d", GetMaxPlayers());
     email_set_var(msg, "bonus", "%.2f", 2500.0);
     return email_send(msg);

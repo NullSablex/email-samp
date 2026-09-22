@@ -51,25 +51,25 @@ The `<title>` becomes the subject. Any other file with no sections is used as th
 One native takes every kind of value:
 
 ```pawn
-email_set_var(msg, "name",  nick);           // text, as written
-email_set_var(msg, "slots", "%d", 200);      // a number
-email_set_var(msg, "vip",   "%d", true);     // a bool: 1 or 0
-email_set_var(msg, "saldo", "%.2f", money);  // decimals, your choice
-email_set_var(msg, "line",  "%s (%d)", name, level);
+email_set_var(msg, "name",  nick);            // text, as written
+email_set_var(msg, "slots", "%d", 200);       // a number
+email_set_var(msg, "saldo", "%.2f", money);   // and its decimals
 ```
 
-!!! warning "The specifiers do not escape anything"
-    `%d`, `%s` and `%f` are not a safety measure, and you do not need them to make a value safe. Escaping is automatic and happens later, when the value lands in the `[html]` part. A specifier only tells a variadic call which kind of cell follows — the same reason `format` needs one — and `%.Nf` additionally picks the decimals.
+A template has no arithmetic and no conditions, so **every value becomes text**, whatever it started as. That is the whole model, and it is why there is so little to learn here:
 
-So **text needs no specifier at all**. With nothing after the value it is used exactly as written, which is why a nickname containing `%` needs no escaping either.
+- **Text** needs no specifier. Pass it as the value and it is used exactly as written — which is also why a nickname containing `%` needs no escaping.
+- **A number** needs `"%d"` for one reason: Pawn cannot pass a number where a string is expected. It formats nothing; the result is the same text either way. A bool goes through `"%d"` too, as `1` or `0`.
 
-| Specifier | Value |
+Only two specifiers actually decide anything:
+
+| Specifier | What it decides |
 |---|---|
-| `%d`, `%i` | an integer, or a bool (`1` / `0`) |
-| `%f`, `%.Nf` | a float; six decimals, or `N` of them |
-| `%s` | a string, when joining it with something else |
-| `%r` | a string, **with the automatic escaping turned off** |
-| `%%` | a literal percent sign |
+| `%.Nf` | how many decimals a float keeps (`%f` alone means six) |
+| `%r` | turns the automatic HTML escaping **off**, for markup you built |
+
+!!! warning "The rest decide nothing, and protect nothing"
+    `%d` and `%s` are not a safety measure, and you never need them to make a value safe: escaping is automatic and happens when the value lands in the `[html]` part. Reaching for a specifier because the value "looks dangerous" is a misunderstanding — the one that changes safety is `%r`, and it changes it in the *unsafe* direction.
 
 ### Escaping, and the one way out
 
