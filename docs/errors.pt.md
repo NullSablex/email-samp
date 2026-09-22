@@ -23,7 +23,7 @@ if (!email_send_to(endereco, "Ola", corpo))
 
 O `email_error(conta, destino)` escreve a mensagem por trás do código, que normalmente é a resposta do próprio relay.
 
-O `email_errno(0)` lê o **espaço global**: falhas anteriores à existência de uma conta, como arquivo de configuração ilegível ou remetente malformado.
+O `email_errno()` lê a conta padrão. Enquanto nenhuma conta estiver aberta, ele lê o **espaço global**, que é onde caem as falhas anteriores a qualquer conta — arquivo de configuração ilegível, remetente malformado.
 
 ## Depois, quando o relay responde
 

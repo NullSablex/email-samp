@@ -34,7 +34,10 @@ impl Logger {
                 .directory(LOG_DIR)
                 .filename(LOG_FILE)
                 .prefix(PREFIX)
-                .level(LevelFilter::Trace)
+                // Info, not Trace: at Trace the whole dependency tree writes
+                // here — rustls alone dumps handshake state and certificates
+                // in hex. `EMAIL_SAMP_LOG_LEVEL=debug` opts back in.
+                .level(LevelFilter::Info)
                 // The SDK drives the banner: it captures `CARGO_PKG_*` in the
                 // macro above and calls this at the end of `install`. We only
                 // add the build stamp and mirror the lines to the console —
