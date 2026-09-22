@@ -1,0 +1,168 @@
+# Copy this to smtp.ini (next to server.cfg) and fill in your own values.
+# Then, in the gamemode, the whole setup is one line:
+#
+#     email_setup();
+#
+# ---------------------------------------------------------------------------
+# CONSIDER USING .env INSTEAD
+# ---------------------------------------------------------------------------
+#
+# The env_samp plugin (https://github.com/NullSablex/env-samp) reads a .env
+# and is the recommended place for credentials: the same file holds the rest
+# of your server's settings. Write the same keys with an smtp. prefix (see
+# env.example) and call:
+#
+#     email_setup_env();
+#
+# Real environment variables (Docker, systemd, CI) work with no glue at all -
+# plain email_setup() reads SMTP_* from the process environment.
+#
+# This file exists for servers that want neither.
+#
+# ---------------------------------------------------------------------------
+# FORMAT
+# ---------------------------------------------------------------------------
+#
+#   - KEY = value, one per line.
+#   - Keys are case-insensitive and an optional SMTP_ prefix is dropped, so
+#     SMTP_HOST, smtp_host and host are the same key. That is why the same
+#     names work here, in a .env, and in the environment.
+#   - `#` starts a comment at the start of a line or after whitespace. NOT
+#     mid-token: password=hunter#2 keeps the `#`.
+#   - Only the first `=` splits the line, so a password may contain `=`.
+#   - 'single quotes' are literal; "double quotes" process \n \r \t \\ \".
+#     Quoting is the only way to keep leading or trailing spaces - which is
+#     what Gmail app passwords need.
+#   - A leading `export ` is stripped, so this file can also be sourced by a
+#     shell.
+#   - An UNRECOGNISED key is an error, not a silent no-op. SMTP_PASSWD would
+#     otherwise look exactly like "no password configured".
+#
+# Keep the real file OUT of version control. Add it to .gitignore:
+#
+#     smtp.ini
+
+# ---------------------------------------------------------------------------
+# Everything at once (this alone is a complete configuration)
+# ---------------------------------------------------------------------------
+# The userinfo is percent-encoded: %40 is '@'. That is what makes a password
+# containing @ / or : unambiguous.
+#
+# url = smtps://bot%40example.com:secret@smtp.example.com
+
+# ---------------------------------------------------------------------------
+# Or key by key
+# ---------------------------------------------------------------------------
+
+host     = smtp.example.com
+user     = noreply@example.com
+password = change-me
+
+# encryption   none | starttls | tls        (default: starttls)
+#                none -> port 25, no TLS at all. Only for a relay on this
+#                        machine; the plugin warns if you use it with
+#                        credentials against a remote host.
+#                starttls -> port 587, plaintext connect then a REQUIRED
+#                        upgrade. If the relay does not offer it, the send
+#                        fails rather than continuing in the clear.
+#                tls  -> port 465, TLS from the first byte.
+# encryption = starttls
+
+# port         only for a non-standard port; otherwise it follows `encryption`
+# port = 2525
+
+# from         From: address shown to recipients   (default: `user`)
+# from_name    display name next to it
+# from      = noreply@example.com
+# from_name = Los Santos RP
+
+# helo         name announced in EHLO   (default: this machine's hostname)
+# helo = ls-rp.example.com
+
+# timeout      seconds                  (default: 30)
+# pool_size    pooled SMTP sessions     (default: 4). Sessions are reused
+#              across sends, so TCP+TLS+AUTH is paid once, not per message.
+# timeout   = 30
+# pool_size = 4
+
+# ---------------------------------------------------------------------------
+# Delivery
+# ---------------------------------------------------------------------------
+
+# retries      extra attempts after a TEMPORARY failure - a 4xx reply, or the
+#              relay unreachable. A permanent one (5xx, wrong password) is
+#              never retried. Your callback runs once, with the final result.
+#              If the relay itself is unreachable, the whole account pauses
+#              (5 s, doubling up to 5 min) instead of every queued message
+#              spending its retries against it.
+# retries = 2
+
+# rate_limit   messages per minute, evenly spaced. 0 = unlimited. Set it to
+#              what your provider allows and mail the whole player base in a
+#              plain loop - the plugin does the pacing. Only this account
+#              waits: other accounts keep sending.
+# rate_limit = 0
+
+# charset      How the 8-bit strings that come from Pawn are read:
+#              windows-1252 (default, what SA-MP uses), windows-1251 for
+#              Cyrillic, or utf-8 if your gamemode already stores UTF-8.
+#              Get it wrong and accented names arrive broken in the mail.
+# charset = windows-1252
+
+# allow_plaintext_auth
+#              1 allows sending the password over an unencrypted connection to
+#              a host that is NOT this machine. Without it, that setup is
+#              refused: anyone on the path would read the password. A relay on
+#              localhost never needs this.
+# allow_plaintext_auth = 0
+
+# dry_run      1 writes every message to logs/dry-run/ as an .eml file and
+#              sends nothing. For working on the gamemode without spending
+#              quota or mailing real players. Open the .eml in any mail
+#              client to see exactly what would have been sent.
+# dry_run = 0
+
+# queue_limit  messages waiting at once. Past it a send fails right away with
+#              EMAIL_ERROR_QUEUE_FULL instead of piling up in memory.
+#              EMAIL_PRIORITY_LOW may fill only three quarters of it;
+#              EMAIL_PRIORITY_HIGH is never refused.
+# queue_limit = 1000
+
+# tls_ca       PEM root certificate, for a relay with an internal or
+#              self-signed CA. The trust store is the root bundle compiled
+#              into the plugin, NOT the operating system's - public providers
+#              (Gmail, SendGrid, Mailgun, SES) need nothing here.
+# tls_ca = certs/internal-ca.pem
+
+# tls_verify   1/0, true/false, yes/no, on/off   (default: 1)
+#              Turning this OFF accepts any certificate, so anyone who can
+#              redirect the connection reads your SMTP password. Use tls_ca
+#              instead. The plugin warns on the console every time.
+# tls_verify = 1
+
+# ---------------------------------------------------------------------------
+# Provider presets
+# ---------------------------------------------------------------------------
+
+# Gmail / Google Workspace - needs an APP PASSWORD, not the account password.
+# The quotes keep the spaces Google shows it with.
+# host     = smtp.gmail.com
+# user     = you@gmail.com
+# password = "abcd efgh ijkl mnop"
+
+# SendGrid - the username is the literal string "apikey".
+# host     = smtp.sendgrid.net
+# user     = apikey
+# password = SG.xxxxxxxxxxxxxxxxxxxxxx
+
+# Mailgun
+# host     = smtp.mailgun.org
+# user     = postmaster@mg.yourdomain.com
+
+# Amazon SES - SMTP credentials from the SES console, NOT your AWS access keys.
+# host     = email-smtp.eu-west-1.amazonaws.com
+
+# A local Postfix relay - no credentials, no encryption. Nothing leaves the box.
+# host       = 127.0.0.1
+# user       =
+# encryption = none
