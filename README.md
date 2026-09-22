@@ -88,7 +88,7 @@ Email::OnMailSent(success, playerid)
 
 ## Documentation
 
-The full documentation lives in [docs/](docs/), in **English and Portuguese**, and is what `mkdocs serve` renders (`*.pt.md` files are the Portuguese pages, served under `/pt/`):
+Full documentation, in English and Portuguese, lives at **<https://email-samp.nullsablex.com/>** (Portuguese under [`/pt/`](https://email-samp.nullsablex.com/pt/)). The Markdown sources are in [docs/](docs/) — `mkdocs serve` from the repo root for a local preview.
 
 | Page | What it answers |
 |---|---|
