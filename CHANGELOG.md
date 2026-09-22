@@ -26,7 +26,7 @@ First release: 34 natives, 2 callbacks and one binary that loads on SA-MP and on
 ### Templates
 
 - **The wording in a file**, edited without recompiling: a `.tpl` with `[subject]`, `[text]` and `[html]` sections, or a plain `.html` file whose `<title>` becomes the subject.
-- **`email_set_var` takes every kind of value** — text as written, or `%d`, `%s`, `%f` and `%.Nf` for numbers, bools and decimals. A template has no arithmetic and no conditions, so every value ends up as text; the specifiers only say which kind of cell a variadic call is passing, and `%.Nf` picks the decimals.
+- **`email_set_var` takes every kind of value** — a template has no arithmetic and no conditions, so every value becomes text whatever it started as. Text is passed as written; a number needs `"%d"` only because Pawn cannot pass one where a string is expected. The only specifiers that decide anything are `%.Nf`, for the decimals a float keeps, and `%r`, which turns the automatic HTML escaping off.
 - **Substitution is a single pass**: a value is never re-scanned, so one variable cannot be used to read another. An unknown marker stays visible in the mail.
 - **Rendered at send time**, so `email_set_template` and `email_set_var` may be called in any order, and the template fills in only what the message left empty.
 - **Cached per file** and reloaded when its size or mtime changes. `email_force_reload_templates` forces it for a deploy that restores timestamps.

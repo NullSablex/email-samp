@@ -47,7 +47,7 @@ Player input can end up in a mail, so the plugin checks it. You do not have to:
 
 ## Also worth knowing
 
-- **Specifiers do not escape anything.** `%d`, `%s` and `%f` only say which kind of value follows, as in `format`. Escaping is automatic and happens when the value lands in the `[html]` part. `%r` is the one way to turn it off, for markup you built yourself.
+- **Every template value becomes text.** Pass text as it is; a number needs `"%d"` only because Pawn cannot pass one where a string is expected. The only specifiers that decide anything are `%.Nf`, for the decimals, and `%r`, which turns the automatic HTML escaping off for markup you built yourself.
 - **Templates are cached** and reload on their own when the file changes; `email_force_reload_templates()` forces it when a timestamp was restored.
 - **`email_stats` is the queue view:** waiting, sent and failed, for one account or for all of them with `EMAIL_EVERY_ACCOUNT`.
 - **Ask for the limits** with `email_limit(EMAIL_LIMIT_RECIPIENTS)` and friends instead of hardcoding them.

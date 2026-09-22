@@ -51,25 +51,25 @@ O `<title>` vira o assunto. Qualquer outro arquivo sem seções é usado como co
 Uma native recebe todo tipo de valor:
 
 ```pawn
-email_set_var(msg, "name",  nick);           // texto, como esta
-email_set_var(msg, "slots", "%d", 200);      // um numero
-email_set_var(msg, "vip",   "%d", true);     // um bool: 1 ou 0
-email_set_var(msg, "saldo", "%.2f", dinheiro); // casas decimais, sua escolha
-email_set_var(msg, "linha", "%s (%d)", nome, nivel);
+email_set_var(msg, "name",  nick);            // texto, como esta
+email_set_var(msg, "slots", "%d", 200);       // um numero
+email_set_var(msg, "saldo", "%.2f", dinheiro); // e as casas decimais
 ```
 
-!!! warning "Os especificadores não escapam nada"
-    `%d`, `%s` e `%f` não são medida de segurança, e você não precisa deles para tornar um valor seguro. O escape é automático e acontece depois, quando o valor entra na parte `[html]`. O especificador só diz a uma chamada variádica que tipo de célula vem a seguir — a mesma razão pela qual o `format` precisa de um — e o `%.Nf` ainda escolhe as casas decimais.
+Um modelo não tem aritmética nem condicional, então **todo valor vira texto**, seja o que for na origem. Esse é o modelo inteiro, e é por isso que há tão pouco a aprender aqui:
 
-Ou seja, **texto não precisa de especificador nenhum**. Sem nada depois do valor, ele é usado exatamente como está, e é por isso que um nick com `%` também não precisa de escape.
+- **Texto** não precisa de especificador. Passe como valor e ele é usado exatamente como está — que é também por que um nick com `%` não precisa de escape.
+- **Número** precisa de `"%d"` por um motivo só: o Pawn não passa número onde se espera texto. Ele não formata nada; o resultado é o mesmo texto de qualquer jeito. Bool vai pelo `"%d"` também, como `1` ou `0`.
 
-| Especificador | Valor |
+Só dois especificadores decidem alguma coisa:
+
+| Especificador | O que decide |
 |---|---|
-| `%d`, `%i` | inteiro, ou bool (`1` / `0`) |
-| `%f`, `%.Nf` | decimal; seis casas, ou `N` delas |
-| `%s` | texto, quando você está juntando com outra coisa |
-| `%r` | texto, **com o escape automático desligado** |
-| `%%` | um sinal de porcentagem literal |
+| `%.Nf` | quantas casas decimais o número mantém (`%f` sozinho são seis) |
+| `%r` | desliga o escape automático de HTML, para marcação que **você** montou |
+
+!!! warning "O resto não decide nada, e não protege nada"
+    `%d` e `%s` não são medida de segurança, e você nunca precisa deles para tornar um valor seguro: o escape é automático e acontece quando o valor entra na parte `[html]`. Procurar um especificador porque o valor "parece perigoso" é um mal-entendido — o que muda a segurança é o `%r`, e muda para o lado **inseguro**.
 
 ### Escape, e a única saída
 

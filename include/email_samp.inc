@@ -611,31 +611,31 @@ native bool:email_embed(message, const path[], const cid[] = "");
 native bool:email_set_template(message, const path[]);
 
 /**
- * Sets {key} for this message. One call for every kind of value:
+ * Sets {key} for this message:
  *
- *     email_set_var(msg, "name",  nick);           // text, as written
- *     email_set_var(msg, "slots", "%d", 200);      // a number
- *     email_set_var(msg, "vip",   "%d", true);     // a bool: 1 or 0
- *     email_set_var(msg, "saldo", "%.2f", money);  // decimals, your choice
- *     email_set_var(msg, "line",  "%s (%d)", name, level);
+ *     email_set_var(msg, "name",  nick);            // text, as written
+ *     email_set_var(msg, "slots", "%d", 200);       // a number
+ *     email_set_var(msg, "saldo", "%.2f", money);   // and its decimals
  *
- * THE SPECIFIERS DO NOT ESCAPE ANYTHING. They are not a safety measure and
- * you do not need them to make a value safe: escaping is automatic and
- * happens later, when the value lands in the template's [html] section. A
- * specifier only tells a variadic call which kind of cell follows - the same
- * reason format() needs one - and %.Nf additionally picks the decimals.
+ * A template has no arithmetic and no conditions: every value becomes text,
+ * whatever it started as. So there is nothing to choose for text - pass it as
+ * the value and it is used exactly as written, which is also why a nickname
+ * containing '%' needs no escaping.
  *
- * So text needs no specifier at all: pass it as the value. With nothing after
- * the value it is used exactly as written, which is why a nickname containing
- * '%' needs no escaping either.
+ * A number needs "%d" for one reason only: Pawn cannot pass a number where a
+ * string is expected. It formats nothing - the result is the same text either
+ * way. A bool goes through "%d" too, as 1 or 0.
  *
- *   %d %i   an integer, or a bool (1 or 0)
- *   %f      a float, six decimals; %.Nf picks N
- *   %s      a string, when you are joining it with something else
- *   %r      a string, WITH THE AUTOMATIC ESCAPING TURNED OFF
- *   %%      a literal percent sign
+ * Only two specifiers actually decide something:
  *
- * %r is the only way to put markup of your own into the [html] section:
+ *   %.Nf   how many decimals a float keeps ("%f" alone means six)
+ *   %r     turns the automatic HTML escaping OFF, for markup you built
+ *
+ * THE OTHERS DO NOT ESCAPE OR PROTECT ANYTHING, and you do not need them to
+ * make a value safe: escaping is automatic and happens when the value lands
+ * in the template's [html] section.
+ *
+ * %r is the only way to put markup of your own in there:
  *
  *     email_set_var(msg, "rows", "%r", built_html);   // you built it
  *     email_set_var(msg, "nick", nick);               // a player typed it
