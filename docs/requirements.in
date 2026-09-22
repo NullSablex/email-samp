@@ -9,7 +9,7 @@
 mkdocs-material==9.7.7
 # Floor above the transitive default: pulls the fix for CVE-2026-61632
 # (path traversal in the b64 extension). mkdocs-material only requires >=10.2.
-pymdown-extensions>=11.0.2
+pymdown-extensions>=12.0.1
 # English + Portuguese versions of every page, from files named page.md and
 # page.pt.md side by side.
 mkdocs-static-i18n==1.3.0
