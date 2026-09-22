@@ -131,8 +131,18 @@ impl EmailPlugin {
 
             match result.error {
                 Some((code, detail)) => {
-                    let what = format!("Send on account {}", result.account_id);
-                    let recipient_detail = format!("to '{}': {detail}", result.recipient);
+                    // A connection test has no recipient, so naming one would
+                    // read as `to ''`.
+                    let what = if result.recipient.is_empty() {
+                        format!("Account {}", result.account_id)
+                    } else {
+                        format!("Send on account {}", result.account_id)
+                    };
+                    let recipient_detail = if result.recipient.is_empty() {
+                        detail.clone()
+                    } else {
+                        format!("to '{}': {detail}", result.recipient)
+                    };
                     self.report(result.account_id, (code, recipient_detail), &what);
                     callback::fire_on_email_error(
                         &self.amx_list,
