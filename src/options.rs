@@ -38,32 +38,6 @@ impl Encryption {
     }
 }
 
-/// How the 8-bit strings that come from Pawn are read.
-///
-/// SA-MP has no notion of UTF-8: a nickname with an accent is a byte in the
-/// server's code page. Reading it as the wrong one is what turns "João" into
-/// "Jo?o" or "JoÃ£o" in the mail.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum Charset {
-    /// Western European, what SA-MP uses by default.
-    #[default]
-    Windows1252,
-    /// Cyrillic, for Russian servers.
-    Windows1251,
-    /// For a gamemode that already stores UTF-8 in its strings.
-    Utf8,
-}
-
-impl Charset {
-    pub fn encoding(self) -> &'static encoding_rs::Encoding {
-        match self {
-            Self::Windows1252 => encoding_rs::WINDOWS_1252,
-            Self::Windows1251 => encoding_rs::WINDOWS_1251,
-            Self::Utf8 => encoding_rs::UTF_8,
-        }
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct EmailOptions {
     /// `None` follows [`Encryption::default_port`], so changing the mode
@@ -90,8 +64,13 @@ pub struct EmailOptions {
     /// Messages per minute; 0 is unlimited. Providers throttle senders that
     /// burst.
     pub rate_limit: u32,
-    /// How Pawn's 8-bit strings are read. Process-wide, not per account.
-    pub charset: Charset,
+    /// How Pawn's 8-bit strings are read: SA-MP has no notion of UTF-8, so a
+    /// nickname with an accent is a byte in the server's code page. Reading it
+    /// as the wrong one is what turns "João" into "Jo?o" in the mail.
+    ///
+    /// Any label the WHATWG standard knows works — the server picks its own,
+    /// instead of the plugin compiling a short list in. Process-wide.
+    pub charset: &'static encoding_rs::Encoding,
     /// Allows sending the password over an unencrypted connection to a host
     /// that is not this machine. Off, and such a setup is refused outright.
     pub allow_plaintext_auth: bool,
@@ -117,7 +96,7 @@ impl Default for EmailOptions {
             retries: 2,
             rate_limit: 0,
             queue_limit: 1000,
-            charset: Charset::default(),
+            charset: encoding_rs::WINDOWS_1252,
             allow_plaintext_auth: false,
             dry_run: false,
         }
@@ -159,12 +138,8 @@ mod tests {
     }
 
     #[test]
-    fn each_charset_maps_to_the_encoding_that_reads_it() {
-        assert_eq!(Charset::Windows1252.encoding().name(), "windows-1252");
-        assert_eq!(Charset::Windows1251.encoding().name(), "windows-1251");
-        assert_eq!(Charset::Utf8.encoding().name(), "UTF-8");
-        // What a server gets without saying anything.
-        assert_eq!(Charset::default(), Charset::Windows1252);
+    fn the_default_charset_is_what_sa_mp_uses() {
+        assert_eq!(EmailOptions::default().charset.name(), "windows-1252");
     }
 
     #[test]

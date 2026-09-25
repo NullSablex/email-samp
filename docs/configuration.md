@@ -89,7 +89,7 @@ The credentials are separate arguments, so a password needs no escaping; everyth
 | `retries` | extra attempts after a *temporary* failure | `2` |
 | `rate_limit` | messages per minute, evenly spaced; `0` unlimited | `0` |
 | `queue_limit` | messages waiting at once | `1000` |
-| `charset` | how Pawn's 8-bit strings are read: `windows-1252`, `windows-1251`, `utf-8` | `windows-1252` |
+| `charset` | how Pawn's 8-bit strings are read; any encoding name | `windows-1252` |
 | `allow_plaintext_auth` | send the password unencrypted to a remote host | `0` |
 | `dry_run` | write to `logs/dry-run/` and send nothing | `0` |
 
@@ -97,7 +97,11 @@ Booleans accept `1`/`0`, `true`/`false`, `yes`/`no`, `on`/`off`.
 
 ### charset
 
-SA-MP has no notion of UTF-8: a nickname with an accent is a byte in the server's code page. Reading it as the wrong one is what turns *João* into `Jo?o` or `JoÃ£o` in the mail. `windows-1252` is what SA-MP uses in most of the world, `windows-1251` is for Cyrillic servers, and `utf-8` is for a gamemode that already stores UTF-8. The setting is process-wide.
+SA-MP has no notion of UTF-8: a nickname with an accent is a byte in the server's code page. Reading it as the wrong one is what turns *João* into `Jo?o` or `JoÃ£o` in the mail.
+
+Any encoding name works, with the usual aliases: `windows-1252` (the default, and what SA-MP uses in most of the world), `windows-1251` for Cyrillic, `windows-1250`, `1253`, `1254`, `1256`, `1257`, `iso-8859-2`, or `utf-8` for a gamemode that already stores UTF-8. An unknown name is refused at startup, naming the key. The setting is process-wide.
+
+Going the other way — a relay reply written back into a Pawn buffer — the conversion can lose characters the code page has no room for, a Cyrillic message on a Windows-1252 server being the obvious case. The plugin says so in the console when that happens, and the full text is in `logs/email.log`.
 
 ### rate_limit, retries and queue_limit
 

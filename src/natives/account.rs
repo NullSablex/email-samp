@@ -163,7 +163,7 @@ impl EmailPlugin {
         // Process-wide, because the AMX conversion is: the last account
         // opened decides, which only matters to a server whose accounts
         // disagree about its own gamemode's encoding.
-        samp::encoding::set_default_encoding(settings.options.charset.encoding());
+        samp::encoding::set_default_encoding(settings.options.charset);
 
         self.register_account(id);
 

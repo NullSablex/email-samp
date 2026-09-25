@@ -16,7 +16,7 @@ use std::path::Path;
 use std::str::FromStr;
 
 use crate::error::{EmailError, Fail};
-use crate::options::{Charset, EmailOptions, Encryption};
+use crate::options::{EmailOptions, Encryption};
 
 /// Every recognised key, after [`crate::config::normalize_key`] and
 /// [`canonical`]. Listed so a typo is reported: `SMTP_PASSWD` would otherwise
@@ -392,15 +392,15 @@ fn parse_encryption(raw: &str) -> Result<Encryption, Fail> {
     }
 }
 
-fn parse_charset(raw: &str) -> Result<Charset, Fail> {
-    match raw.trim().to_ascii_lowercase().replace(['-', '_'], "") {
-        v if v == "windows1252" || v == "cp1252" || v == "latin1" || v == "ansi" => {
-            Ok(Charset::Windows1252)
-        }
-        v if v == "windows1251" || v == "cp1251" || v == "cyrillic" => Ok(Charset::Windows1251),
-        v if v == "utf8" => Ok(Charset::Utf8),
-        _ => Err(bad_value("charset", "windows-1252, windows-1251 or utf-8")),
-    }
+/// Any label the WHATWG standard knows: `windows-1252`, `windows-1251`,
+/// `iso-8859-2`, `utf-8`, and their aliases (`latin1`, `cp1251`, ...).
+fn parse_charset(raw: &str) -> Result<&'static encoding_rs::Encoding, Fail> {
+    encoding_rs::Encoding::for_label(raw.trim().as_bytes()).ok_or_else(|| {
+        bad_value(
+            "charset",
+            "an encoding name such as windows-1252, windows-1251, iso-8859-2 or utf-8",
+        )
+    })
 }
 
 fn parse_bool(raw: &str) -> Option<bool> {
@@ -500,17 +500,19 @@ mod tests {
     }
 
     #[test]
-    fn the_charset_spellings_all_resolve() {
+    fn any_known_encoding_label_resolves() {
         for (raw, expected) in [
-            ("windows-1252", Charset::Windows1252),
-            ("cp1252", Charset::Windows1252),
-            ("latin1", Charset::Windows1252),
-            ("windows-1251", Charset::Windows1251),
-            ("UTF-8", Charset::Utf8),
-            ("utf8", Charset::Utf8),
+            ("windows-1252", "windows-1252"),
+            ("cp1252", "windows-1252"),
+            ("latin1", "windows-1252"),
+            ("windows-1251", "windows-1251"),
+            // The ones a short hardcoded list would have left out.
+            ("windows-1254", "windows-1254"),
+            ("iso-8859-2", "ISO-8859-2"),
+            ("UTF-8", "UTF-8"),
         ] {
             let s = from_map(&map(&[("host", "h"), ("charset", raw)])).expect("valid");
-            assert_eq!(s.options.charset, expected, "for {raw}");
+            assert_eq!(s.options.charset.name(), expected, "for {raw}");
         }
         assert!(from_map(&map(&[("host", "h"), ("charset", "klingon")])).is_err());
     }

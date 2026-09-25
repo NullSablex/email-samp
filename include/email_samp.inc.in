@@ -82,8 +82,9 @@
 //                (default: 0). Other accounts are never held back by it.
 //   queue_limit  messages waiting at once; past it a send fails with
 //                EMAIL_ERROR_QUEUE_FULL              (default: 1000)
-//   charset      how Pawn's 8-bit strings are read: windows-1252 (default,
-//                what SA-MP uses), windows-1251 (Cyrillic) or utf-8 for a
+//   charset      how Pawn's 8-bit strings are read. Any encoding name works -
+//                windows-1252 (default, what SA-MP uses), windows-1251,
+//                windows-1250/1253/1254/1256/1257, iso-8859-2, utf-8 for a
 //                gamemode that already stores UTF-8. Reading it wrong is what
 //                turns "Joao" with a tilde into "Jo?o" in the mail.
 //   allow_plaintext_auth

@@ -71,7 +71,7 @@ Sends go through a scheduler rather than a queue, and no worker ever sleeps hold
 
 ### Platform
 
-- **Accented names survive the trip** — Pawn's 8-bit strings are read as the server's code page (`charset`: `windows-1252` by default, `windows-1251`, or `utf-8`), instead of being assumed to be UTF-8 and arriving as `Jo?o`.
+- **Accented names survive the trip** — Pawn's 8-bit strings are read as the server's code page (`charset`, any encoding name; `windows-1252` by default), instead of being assumed to be UTF-8 and arriving as `Jo?o`. Writing back, a character the code page cannot represent is reported instead of silently becoming `?`.
 - **Two includes** — `<email_samp>` in snake_case and `<email_samp_omp>` in open.mp's `Prefix_PascalCase`, generated from the first so they cannot drift.
 - **No external dependencies** — no PHPMailer, no `sendmail`, no OpenSSL. SMTP and TLS (rustls) are compiled into the binary, for Linux i686 and Windows i686 (MSVC).
 - **Documentation** in English and Portuguese, and seven runnable examples covering every native.
