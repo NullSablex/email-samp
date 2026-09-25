@@ -18,7 +18,7 @@
 
 #pragma library email_samp
 
-#define EMAIL_SAMP_VERSION "0.1.0"
+#define EMAIL_SAMP_VERSION "1.0.0"
 
 
 // ---------------------------------------------------------------------------

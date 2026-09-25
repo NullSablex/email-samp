@@ -1,5 +1,5 @@
 /*
- * email_samp v0.1.0 - SMTP mail plugin for SA-MP and Open Multiplayer.
+ * email_samp v1.0.0 - SMTP mail plugin for SA-MP and Open Multiplayer.
  * Author:     NullSablex
  * Repository: https://github.com/NullSablex/email-samp
  * License:    GPL-3.0
@@ -34,7 +34,7 @@
 
 #pragma library email_samp
 
-#define EMAIL_SAMP_VERSION "0.1.0"
+#define EMAIL_SAMP_VERSION "1.0.0"
 
 
 // ---------------------------------------------------------------------------
