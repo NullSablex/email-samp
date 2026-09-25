@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/NullSablex/email-samp/security/advisories/new
+    about: Report it privately, never as a public issue. See SECURITY.md.
+  - name: Documentation
+    url: https://email-samp.nullsablex.com/
+    about: Configuration, sending, templates, errors and security, page by page.

@@ -154,6 +154,12 @@ PROFILE=dev ./scripts/build-linux.sh  # development build
 - **Credentials never reach the console.** Passwords, addresses and relay replies go to `logs/email.log` only; the console gets a short line and an error code.
 - Keep `smtp.ini` and `.env` out of version control.
 
+## Contributing
+
+Bug reports, questions and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for how the project is built and what a change has to satisfy. Participation follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+Found a security vulnerability? Please report it privately: [SECURITY.md](SECURITY.md).
+
 ## License
 
 This project is distributed under the [GNU General Public License v3.0](LICENSE). You can use, modify and redistribute it freely, provided derivative works are released under the same license with source code available.

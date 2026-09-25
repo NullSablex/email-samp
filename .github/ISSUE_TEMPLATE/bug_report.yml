@@ -1,0 +1,59 @@
+name: Bug report
+description: Something the plugin does wrong, or does not do at all.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste a real password.** Replace it with `xxx` in anything you
+        attach — `.env`, `smtp.ini`, a log excerpt or a screenshot.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: The smallest gamemode snippet that shows it, and the steps.
+      render: pawn
+    validations:
+      required: true
+  - type: dropdown
+    id: server
+    attributes:
+      label: Server
+      options:
+        - open.mp, native component (components/)
+        - open.mp, legacy plugin (plugins/ + legacy_plugins)
+        - SA-MP
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version
+      description: The banner prints it when the server starts.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: relay
+    attributes:
+      label: Relay
+      description: Gmail, SendGrid, Mailgun, SES, a local Postfix...
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log
+      description: |
+        The relevant lines from the console and from `logs/email.log`, with
+        credentials removed. `email_errno` / `email_error` help too.
+      render: text
+    validations:
+      required: false
