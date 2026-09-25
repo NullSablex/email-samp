@@ -21,6 +21,13 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(deps)"
+    # Transitive crates too, not only what Cargo.toml declares. Almost nothing
+    # the plugin ships is in the manifest: rustls arrives through lettre, and
+    # so does most of the lockfile. That default is what let RUSTSEC-2026-0285
+    # sit in Cargo.lock while a fixed rustls had been out for days, until
+    # `cargo audit` happened to be run by hand.
+    allow:
+      - dependency-type: "all"
     groups:
       cargo:
         patterns:
@@ -28,6 +35,12 @@ updates:
         update-types:
           - "minor"
           - "patch"
+      # One pull request for all the security updates of a week, rather than
+      # one per crate: a group covers version updates unless it says otherwise.
+      cargo-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
   - package-ecosystem: "pip"
     directory: "/docs"
     schedule:

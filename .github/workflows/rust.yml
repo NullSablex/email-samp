@@ -5,6 +5,21 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+  # Weekly, for the security audit only — every other job opts out below.
+  #
+  # Dependabot is the first line and now tracks transitive crates, so a patched
+  # version arrives as an ordinary lockfile pull request. This is the second
+  # line, for what that misses: an advisory RustSec carries and the GitHub
+  # Advisory Database does not, or one with no fixed version to bump to.
+  # Waiting for someone to open a pull request is the wrong trigger for that —
+  # it turns an unrelated PR red instead of telling us. On a schedule,
+  # rustsec/audit-check opens an issue.
+  #
+  # Mondays, a few hours before Dependabot's weekly run, so the two do not
+  # report the same thing twice.
+  schedule:
+    - cron: '41 5 * * 1'
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
@@ -17,6 +32,8 @@ jobs:
   build:
     name: Build, test, clippy
     runs-on: ubuntu-latest
+    # The scheduled run exists for the audit; there is no new code to build.
+    if: github.event_name != 'schedule'
     permissions:
       contents: read
     steps:
@@ -50,6 +67,8 @@ jobs:
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
+    # The scheduled run exists for the audit; there is no new code to build.
+    if: github.event_name != 'schedule'
     permissions:
       contents: read
     steps:
@@ -84,6 +103,8 @@ jobs:
   coverage:
     name: Coverage (llvm-cov)
     runs-on: ubuntu-latest
+    # The scheduled run exists for the audit; there is no new code to build.
+    if: github.event_name != 'schedule'
     permissions:
       contents: read
     steps:
