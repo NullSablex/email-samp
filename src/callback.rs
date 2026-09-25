@@ -41,6 +41,17 @@ pub enum CallbackParam {
     String(String),
 }
 
+impl CallbackParam {
+    /// The `format` letter that describes it.
+    fn specifier(&self) -> char {
+        match self {
+            Self::Int(_) => 'd',
+            Self::Float(_) => 'f',
+            Self::String(_) => 's',
+        }
+    }
+}
+
 /// A Pawn public and the arguments to call it with. `format` is what the
 /// gamemode passed to `email_send` — `d`/`i` int, `f` float, `s` string — so
 /// it and `params` have the same length by construction.
@@ -63,9 +74,15 @@ impl CallbackInfo {
     /// Prepends a parameter, which is how the send result becomes the
     /// callback's first argument.
     ///
+    /// The specifier goes in with it: the push loop walks `format`, so a
+    /// parameter without one is never pushed — and every later argument
+    /// shifts by one, arriving as whatever was on the stack.
+    ///
     /// Rebuilds the vector rather than calling `Vec::insert(0, ..)`, which
     /// would shift every element anyway.
     pub fn prepend(&mut self, param: CallbackParam) {
+        self.format.insert(0, param.specifier());
+
         let mut params = Vec::with_capacity(self.params.len() + 1);
         params.push(param);
         params.append(&mut self.params);
@@ -196,7 +213,7 @@ mod tests {
     fn prepend_puts_the_result_first_and_keeps_the_rest_in_order() {
         let mut info = CallbackInfo {
             name: "OnMailSent".into(),
-            format: "dds".into(),
+            format: "ds".into(),
             params: vec![
                 CallbackParam::Int(7),
                 CallbackParam::String("player".into()),
@@ -211,10 +228,47 @@ mod tests {
     }
 
     #[test]
+    fn prepend_brings_the_specifier_with_it() {
+        // The push loop walks `format`, so a parameter with no specifier is
+        // never pushed and every later argument arrives shifted by one. This
+        // is what made `OnMailSent(success, playerid)` see a stale playerid.
+        let mut info = CallbackInfo {
+            name: "OnMailSent".into(),
+            format: "ds".into(),
+            params: vec![
+                CallbackParam::Int(7),
+                CallbackParam::String("player".into()),
+            ],
+        };
+        info.prepend(CallbackParam::Int(1));
+        assert_eq!(info.format, "dds");
+        assert_eq!(info.format.chars().count(), info.params.len());
+    }
+
+    #[test]
     fn prepend_onto_an_empty_parameter_list() {
+        // A callback with no extras: `email_test(0, "OnTested")`. Without the
+        // specifier nothing at all reached the public, not even the result.
         let mut info = CallbackInfo::empty();
         info.prepend(CallbackParam::Int(0));
         assert_eq!(info.params.len(), 1);
+        assert_eq!(info.format, "d");
+    }
+
+    #[test]
+    fn every_parameter_read_from_pawn_keeps_format_and_params_in_step() {
+        let mut info = CallbackInfo {
+            name: "OnMailSent".into(),
+            format: "dfs".into(),
+            params: vec![
+                CallbackParam::Int(1),
+                CallbackParam::Float(2.5),
+                CallbackParam::String("x".into()),
+            ],
+        };
+        info.prepend(CallbackParam::Float(0.0));
+        assert_eq!(info.format, "fdfs");
+        assert_eq!(info.format.chars().count(), info.params.len());
     }
 
     #[test]

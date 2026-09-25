@@ -112,6 +112,9 @@ pub struct SendJob {
 
 pub struct SendResult {
     pub account_id: i32,
+    /// False for a connection test, which is not a message: nothing left the
+    /// server, so `OnEmailSent` has nothing to announce.
+    pub is_message: bool,
     /// `None` on success.
     pub error: Option<Fail>,
     /// The address the failure is about, for `OnEmailError`. Empty for a test.
@@ -311,6 +314,7 @@ impl SendManager {
                     // the entry with it.
                     let failed = SendResult {
                         account_id: entry.job.account_id,
+                        is_message: !matches!(entry.job.job, Job::Test),
                         error: None,
                         recipient: entry.recipient.clone(),
                         callback: entry.job.callback.clone(),
@@ -512,6 +516,7 @@ fn finish(entry: Entry, outcome: Result<(), Fail>) -> SendResult {
 
     SendResult {
         account_id: entry.job.account_id,
+        is_message: !matches!(entry.job.job, Job::Test),
         error: outcome.err(),
         recipient: entry.recipient,
         callback: entry.job.callback,
