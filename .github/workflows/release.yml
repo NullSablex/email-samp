@@ -119,7 +119,7 @@ jobs:
           - \`${PLUGIN_NAME}.inc\` — Pawn include, identical file for SA-MP and Open Multiplayer.
           - \`${PLUGIN_NAME}_omp.inc\` — the same API under open.mp's \`Prefix_PascalCase\` naming (\`Email_Setup\`, \`Email_SendTo\`). Pure Pawn aliases; pick one include per script, not both.
 
-          The same \`.so\` / \`.dll\` runs on SA-MP and on Open Multiplayer (native component or legacy). Installation: see the [README](https://github.com/${GITHUB_REPOSITORY}#readme).
+          The same \`.so\` / \`.dll\` runs on SA-MP and on Open Multiplayer (native component or legacy). Installation paths: see [\`docs/installation.md\`](https://github.com/${GITHUB_REPOSITORY}/blob/master/docs/installation.md).
           EOF
           )
 
