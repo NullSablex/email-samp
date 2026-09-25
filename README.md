@@ -107,17 +107,23 @@ The rest of [`examples/`](examples/) covers one question each — where to keep 
 
 ## Configuration
 
-One table of keys, read the same way from every source — a `.env` through [env_samp](https://github.com/NullSablex/env-samp), the process environment, an SMTP URL, `smtp.ini`, or the settings string `email_connect` takes:
+One table of keys, read the same way from every source — a `.env` through [env_samp](https://github.com/NullSablex/env-samp), the process environment, an SMTP URL, `smtp.ini`, or the settings string `email_connect` takes.
 
+Three of them usually do:
+
+```ini
+host     = smtp.gmail.com
+user     = bot@example.com
+password = "an app password"
 ```
-host  user  password  port  encryption  from  from_name  helo  timeout
-pool_size  tls_ca  tls_verify  charset  allow_plaintext_auth
-retries  rate_limit  queue_limit  dry_run          (plus url, which carries several at once)
-```
+
+The port follows from the encryption, which defaults to a required STARTTLS.
+
+The rest are optional and cover the sender's identity (`from`, `from_name`, `helo`), the connection (`port`, `encryption`, `timeout`, `pool_size`, `tls_ca`, `tls_verify`, `allow_plaintext_auth`, `charset`), how fast mail leaves (`retries`, `rate_limit`, `queue_limit`) and `dry_run`; a single `url` can carry several at once. [Configuration](docs/configuration.md) explains what each one does.
 
 Keys are case-insensitive and an optional `SMTP_` prefix is dropped, so `SMTP_HOST`, `smtp_host` and `host` are one key. An unrecognised key is an error, never a silent no-op: `SMTP_PASSWD` would otherwise look exactly like "no password configured".
 
-Usually `host`, `user` and `password` are all it takes — the port follows from the encryption, which defaults to required STARTTLS. See [Configuration](docs/configuration.md) for what each key does, and the ready-made [`env.example`](examples/env.example) and [`smtp.ini.example`](examples/smtp.ini.example).
+Ready-made templates: [`env.example`](examples/env.example) for a `.env`, [`smtp.ini.example`](examples/smtp.ini.example) for a file.
 
 ## Building from source
 

@@ -23,7 +23,7 @@ if (!email_send_to(endereco, "Ola", corpo))
 
 O `email_error(conta, destino)` escreve a mensagem por trás do código, que normalmente é a resposta do próprio relay.
 
-O `email_errno()` lê a conta padrão. Enquanto nenhuma conta estiver aberta, ele lê o **espaço global**, que é onde caem as falhas anteriores a qualquer conta — arquivo de configuração ilegível, remetente malformado.
+O `email_errno()` sem argumento é **a última falha de qualquer conta** — e é também o único lugar onde se lê um `email_setup` ou `email_connect` que falhou, já que aí ainda não existe conta. Passe o id de uma conta para ver a última falha dela.
 
 ## Depois, quando o relay responde
 

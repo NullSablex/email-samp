@@ -23,7 +23,7 @@ if (!email_send_to(address, "Hello", body))
 
 `email_error(account, dest)` writes the message behind the code, which is usually the relay's own reply.
 
-`email_errno()` reads the default account. Before any account is open it reads the **global slot** instead, which is where failures from before one existed land — an unreadable config file, a malformed sender address.
+`email_errno()` with no argument is **the last failure on any account** — which is also the only place a failed `email_setup` or `email_connect` can be read, since no account exists yet. Pass an account id for that account's own last failure.
 
 ## Later, when the relay answers
 

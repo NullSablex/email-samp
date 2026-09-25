@@ -230,13 +230,18 @@ impl AccountManager {
         self.accounts.contains_key(&id)
     }
 
+    /// Records a failure against its account *and* in the global slot.
+    ///
+    /// The global slot is what `email_errno()` reads: the last thing that went
+    /// wrong, whichever account it belonged to. Without it a gamemode could
+    /// not see a failed `email_setup`/`email_connect` at all — there is no
+    /// account to ask yet — and after a failed send on the default account it
+    /// would read a slot nobody had written.
     pub fn set_error(&mut self, id: i32, state: ErrorState) {
-        match self.accounts.get_mut(&id) {
-            Some(account) => account.error = state,
-            // An error against an account that is already gone still has to
-            // land somewhere a gamemode can read it.
-            None => self.global_error = state,
+        if let Some(account) = self.accounts.get_mut(&id) {
+            account.error = state.clone();
         }
+        self.global_error = state;
     }
 
     /// The three counters added up across every open account, for a server
@@ -660,6 +665,24 @@ mod tests {
 
         mgr.close(a);
         assert_eq!(mgr.totals(), (1, 3, 0));
+    }
+
+    #[test]
+    fn the_global_slot_holds_the_last_failure_whatever_the_account() {
+        let mut mgr = AccountManager::new();
+        let (a, _) = mgr
+            .connect(&settings("a.example.com", "u@e.com", options()))
+            .expect("builds");
+
+        // A failure before any account exists — a bad config file — has no
+        // account to land on, and must still be readable.
+        mgr.set_error(0, ErrorState::new(EmailError::ConfigFailed, "no host"));
+        assert_eq!(mgr.get_error(0).code, EmailError::ConfigFailed);
+
+        // One on a real account lands in both places.
+        mgr.set_error(a, ErrorState::new(EmailError::AuthFailed, "535"));
+        assert_eq!(mgr.get_error(a).code, EmailError::AuthFailed);
+        assert_eq!(mgr.get_error(0).code, EmailError::AuthFailed);
     }
 
     #[test]
