@@ -290,9 +290,9 @@ native bool:Email_Test(account = 0, const callback[] = "", const format[] = "", 
 /**
  * Last error code for an account.
  *
- * @param account  account id, or 0 for the default account. With no account
- *                 open, 0 is the global slot, where failures from before one
- *                 existed land (a bad config file, a malformed sender)
+ * @param account  0 for the last failure on any account - which is also where
+ *                 a failed Email_Setup lands, since no account exists yet -
+ *                 or an id for that account's own last failure
  * @return an EMAIL_ERROR_* value, or 0 for none
  */
 native Email_Errno(account = 0) = email_errno;
@@ -304,8 +304,8 @@ native Email_Errno(account = 0) = email_errno;
  * reason from OnEmailError instead: by the time your callback runs, another
  * send may have overwritten the slot.
  *
- * @param account   account id, or 0 for the default account (the global slot
- *                  when none is open)
+ * @param account   0 for the last failure on any account, or an id for that
+ *                  account's own
  * @param dest      destination buffer
  * @param dest_len  size of dest
  * @return true on success
