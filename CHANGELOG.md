@@ -4,9 +4,11 @@ All notable changes to this project are documented in this file.
 
 Format inspired by [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
-## [0.1.0] — 2026/09/22
+## [1.0.0] — 2026/09/26
 
 First release: 34 natives, 2 callbacks and one binary that loads on SA-MP and on Open Multiplayer, natively as a component or through legacy mode.
+
+Every path below was exercised against a real open.mp server and a real relay, not only in the test suite: mail delivered over STARTTLS to Gmail, templates rendered, an image embedded and a file attached (both arriving byte-identical), accented text from a Windows-1252 gamemode, `rate_limit` spacing a batch one second apart, and `dry_run` writing `.eml` files without touching the network.
 
 ### Sending
 

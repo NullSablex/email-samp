@@ -88,8 +88,6 @@ Email::OnMailSent(success, playerid)
 
 ## Documentation
 
-Full documentation, in English and Portuguese, lives at **<https://email-samp.nullsablex.com/>** (Portuguese under [`/pt/`](https://email-samp.nullsablex.com/pt/)). The Markdown sources are in [docs/](docs/) — `mkdocs serve` from the repo root for a local preview.
-
 | Page | What it answers |
 |---|---|
 | [Installation](docs/installation.md) | Where the files go on SA-MP and on open.mp |
@@ -109,9 +107,17 @@ The rest of [`examples/`](examples/) covers one question each — where to keep 
 
 ## Configuration
 
-Every source takes the same keys — `host`, `user`, `password`, `port`, `encryption`, `from`, `from_name`, `timeout`, `pool_size`, `tls_ca`, `tls_verify`, `retries`, `rate_limit`, `queue_limit`, `dry_run`. Keys are case-insensitive and an optional `SMTP_` prefix is dropped, so `SMTP_HOST`, `smtp_host` and `host` are one key. An unrecognised key is an error, never a silent no-op.
+One table of keys, read the same way from every source — a `.env` through [env_samp](https://github.com/NullSablex/env-samp), the process environment, an SMTP URL, `smtp.ini`, or the settings string `email_connect` takes:
 
-Templates: [`examples/env.example`](examples/env.example) for a `.env`, [`examples/smtp.ini.example`](examples/smtp.ini.example) for a file.
+```
+host  user  password  port  encryption  from  from_name  helo  timeout
+pool_size  tls_ca  tls_verify  charset  allow_plaintext_auth
+retries  rate_limit  queue_limit  dry_run          (plus url, which carries several at once)
+```
+
+Keys are case-insensitive and an optional `SMTP_` prefix is dropped, so `SMTP_HOST`, `smtp_host` and `host` are one key. An unrecognised key is an error, never a silent no-op: `SMTP_PASSWD` would otherwise look exactly like "no password configured".
+
+Usually `host`, `user` and `password` are all it takes — the port follows from the encryption, which defaults to required STARTTLS. See [Configuration](docs/configuration.md) for what each key does, and the ready-made [`env.example`](examples/env.example) and [`smtp.ini.example`](examples/smtp.ini.example).
 
 ## Building from source
 
