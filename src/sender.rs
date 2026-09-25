@@ -505,18 +505,25 @@ fn write_dry_run(message: &lettre::Message) -> Result<(), Fail> {
 
 /// Settles the account's counters and produces the callback's result.
 fn finish(entry: Entry, outcome: Result<(), Fail>) -> SendResult {
+    let is_message = !matches!(entry.job.job, Job::Test);
     let stats = &entry.job.account.stats;
+
+    // The queue held it either way, but `sent` and `failed` count mail: a
+    // connection test is not one, and counting it would make a gamemode's
+    // "3 sent today" wrong by however many times it checked its own setup.
     stats.queued.fetch_sub(1, Ordering::Relaxed);
-    let counter = if outcome.is_ok() {
-        &stats.sent
-    } else {
-        &stats.failed
-    };
-    counter.fetch_add(1, Ordering::Relaxed);
+    if is_message {
+        let counter = if outcome.is_ok() {
+            &stats.sent
+        } else {
+            &stats.failed
+        };
+        counter.fetch_add(1, Ordering::Relaxed);
+    }
 
     SendResult {
         account_id: entry.job.account_id,
-        is_message: !matches!(entry.job.job, Job::Test),
+        is_message,
         error: outcome.err(),
         recipient: entry.recipient,
         callback: entry.job.callback,
@@ -756,6 +763,25 @@ mod tests {
         // One pause per failed attempt: the retry waited for the gate rather
         // than a delay of its own.
         assert_eq!(account.gate.lock().expect("gate").failures(), 2);
+    }
+
+    #[test]
+    fn a_connection_test_is_not_counted_as_mail() {
+        let relay = FakeRelay::start(&[]);
+        let account = account_on(relay.port, retrying(0));
+
+        let result = deliver(SendJob {
+            job: Job::Test,
+            ..job(&account, Priority::High, "x@example.com")
+        });
+        assert!(result.error.is_none(), "{:?}", result.error);
+        assert!(!result.is_message);
+        // Queued while it ran, and counted in neither column afterwards.
+        assert_eq!(account.stats.get(), (0, 0, 0));
+
+        // A real message on the same account still counts.
+        deliver(job(&account, Priority::Normal, "player@example.com"));
+        assert_eq!(account.stats.get(), (0, 1, 0));
     }
 
     #[test]

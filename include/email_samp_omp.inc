@@ -262,7 +262,7 @@ native bool:Email_Status(account, dest[], dest_len = sizeof(dest)) = email_statu
  * @param account  account id, 0 for the default account, or
  *                 EMAIL_EVERY_ACCOUNT for every account added up
  * @param queued   still to go out: waiting, being retried, or in flight
- * @param sent     handed to the relay
+ * @param sent     messages handed to the relay (Email_Test is not one)
  * @param failed   failed for good, after any retries
  * @return true on success, false if the account is unknown
  */
