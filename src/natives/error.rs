@@ -1,7 +1,24 @@
 use samp::native;
 use samp::prelude::*;
 
+use crate::logger::Logger;
 use crate::plugin::EmailPlugin;
+
+/// Writes `text` into a Pawn buffer, saying so when the server's code page
+/// cannot represent it.
+///
+/// The conversion is lossy by nature — a Cyrillic relay reply on a
+/// Windows-1252 server has nowhere to go — but arriving as `?????` with
+/// nothing said anywhere is how an hour gets spent on the wrong question.
+fn write_checked(dest: UnsizedBuffer, dest_len: usize, text: &str, what: &str) -> AmxResult<bool> {
+    if !dest.write_str_checked(dest_len, text)? {
+        Logger::warn(&format!(
+            "The {what} has characters this server's charset cannot write; \
+             they arrive as '?'. The full text is in logs/email.log."
+        ));
+    }
+    Ok(true)
+}
 
 impl EmailPlugin {
     /// `email_errno(account = 0)` — the `EMAIL_ERROR_*` code of the last
@@ -24,7 +41,6 @@ impl EmailPlugin {
     ) -> AmxResult<bool> {
         let account_id = self.resolve_account(account_id);
         let message = self.accounts.get_error(account_id).message.clone();
-        dest.write_str(dest_len, &message)?;
-        Ok(true)
+        write_checked(dest, dest_len, &message, "error message")
     }
 }

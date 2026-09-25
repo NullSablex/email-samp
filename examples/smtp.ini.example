@@ -103,9 +103,10 @@ password = change-me
 #              waits: other accounts keep sending.
 # rate_limit = 0
 
-# charset      How the 8-bit strings that come from Pawn are read:
-#              windows-1252 (default, what SA-MP uses), windows-1251 for
-#              Cyrillic, or utf-8 if your gamemode already stores UTF-8.
+# charset      How the 8-bit strings that come from Pawn are read. Any
+#              encoding name: windows-1252 (default, what SA-MP uses),
+#              windows-1251 for Cyrillic, windows-1250/1253/1254/1256/1257,
+#              iso-8859-2, or utf-8 if your gamemode already stores UTF-8.
 #              Get it wrong and accented names arrive broken in the mail.
 # charset = windows-1252
 

@@ -89,7 +89,7 @@ O `email_setup()` sem argumento tenta primeiro as **variáveis de ambiente** e d
 | `retries` | tentativas extras após falha **temporária** | `2` |
 | `rate_limit` | mensagens por minuto, espaçadas; `0` é sem limite | `0` |
 | `queue_limit` | mensagens esperando ao mesmo tempo | `1000` |
-| `charset` | como as strings de 8 bits do Pawn são lidas: `windows-1252`, `windows-1251`, `utf-8` | `windows-1252` |
+| `charset` | como as strings de 8 bits do Pawn são lidas; qualquer nome de codificação | `windows-1252` |
 | `allow_plaintext_auth` | mandar a senha sem criptografia para host remoto | `0` |
 | `dry_run` | escrever em `logs/dry-run/` e não enviar nada | `0` |
 
@@ -97,7 +97,11 @@ Booleanos aceitam `1`/`0`, `true`/`false`, `yes`/`no`, `on`/`off`.
 
 ### charset
 
-O SA-MP não tem noção de UTF-8: um nick com acento é um byte na página de código do servidor. Ler pela página errada é o que transforma *João* em `Jo?o` ou `JoÃ£o` no e-mail. `windows-1252` é o que o SA-MP usa na maior parte do mundo, `windows-1251` é para servidores cirílicos, e `utf-8` é para gamemode que já guarda UTF-8. O ajuste vale para o processo inteiro.
+O SA-MP não tem noção de UTF-8: um nick com acento é um byte na página de código do servidor. Ler pela página errada é o que transforma *João* em `Jo?o` ou `JoÃ£o` no e-mail.
+
+Qualquer nome de codificação funciona, com os apelidos de sempre: `windows-1252` (o padrão, e o que o SA-MP usa na maior parte do mundo), `windows-1251` para cirílico, `windows-1250`, `1253`, `1254`, `1256`, `1257`, `iso-8859-2`, ou `utf-8` para gamemode que já guarda UTF-8. Nome desconhecido é recusado ao subir, dizendo qual chave. O ajuste vale para o processo inteiro.
+
+No caminho inverso — a resposta do relay escrita de volta num buffer do Pawn — a conversão pode perder caracteres que a página de código não comporta, sendo o caso óbvio uma mensagem em cirílico num servidor Windows-1252. O plugin avisa no console quando isso acontece, e o texto completo fica em `logs/email.log`.
 
 ### rate_limit, retries e queue_limit
 
