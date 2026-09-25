@@ -125,7 +125,7 @@ new waiting, sent, failed;
 email_stats(EMAIL_EVERY_ACCOUNT, waiting, sent, failed);
 ```
 
-`waiting` is what still has to go out, including messages being retried. Pass an account id, or `0` for the default one, to see just that account.
+`waiting` is what still has to go out, including messages being retried. `email_test` passes through the queue but counts in neither `sent` nor `failed`: it is a check, not mail. Pass an account id, or `0` for the default one, to see just that account.
 
 The three outputs have defaults, so you can ask for only the first one or two — `email_stats(0, waiting)` is a valid call. The `0` in the declaration is just what the hidden cell starts as; the plugin writes over it.
 

@@ -538,6 +538,26 @@ mod tests {
     }
 
     #[test]
+    fn accents_survive_the_subject_and_the_body() {
+        let mut draft = draft_with_recipient();
+        draft.subject = "Confirmação da conta de João".into();
+        draft.text = "Olá João, sua inscrição está pronta. Ação: /confirmar".into();
+
+        let msg = build(&draft, &mailbox("noreply@example.com")).expect("builds");
+        let wire = String::from_utf8(msg.formatted()).expect("utf-8");
+
+        // The subject cannot carry raw 8-bit bytes, so it is encoded per
+        // RFC 2047 rather than mangled or stripped.
+        assert!(wire.contains("Subject: =?utf-8?"), "{wire}");
+        assert!(!wire.contains("Confirma\u{e7}\u{e3}o da conta"));
+        // The body carries its own charset and encoding, so the accents are
+        // there to be decoded.
+        assert!(wire.contains("charset=utf-8"));
+        let body = wire.rsplit("\r\n\r\n").next().expect("body");
+        assert!(!body.is_empty());
+    }
+
+    #[test]
     fn a_hostile_value_is_escaped_in_the_html_and_left_alone_in_the_text() {
         let mut draft = draft_with_recipient();
         draft

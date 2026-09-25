@@ -125,7 +125,7 @@ new faltam, enviados, falharam;
 email_stats(EMAIL_EVERY_ACCOUNT, faltam, enviados, falharam);
 ```
 
-`faltam` é o que ainda tem que sair, incluindo mensagens em nova tentativa. Passe o id de uma conta, ou `0` para a padrão, para ver só aquela.
+`faltam` é o que ainda tem que sair, incluindo mensagens em nova tentativa. O `email_test` passa pela fila mas não entra em `enviados` nem em `falharam`: ele é uma conferência, não um e-mail. Passe o id de uma conta, ou `0` para a padrão, para ver só aquela.
 
 As três saídas têm valor padrão, então dá para pedir só a primeira ou as duas primeiras — `email_stats(0, faltam)` é chamada válida. O `0` da declaração é só o conteúdo inicial da célula escondida; o plugin escreve por cima.
 

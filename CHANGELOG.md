@@ -63,7 +63,7 @@ Sends go through a scheduler rather than a queue, and no worker ever sleeps hold
 
 - **`email_errno` / `email_error`** — `0` is the default account, or the global slot while no account is open, which is where failures from before one existed land.
 - **`OnEmailError`** fires once per message, after any retries, so an error there is final. **`OnEmailSent`** is its counterpart for mail that leaves. Both reach only the scripts that define them, worked out once when each script loads.
-- **`email_stats`** — waiting, sent and failed, per account or for every account with `EMAIL_EVERY_ACCOUNT`.
+- **`email_stats`** — waiting, sent and failed, per account or for every account with `EMAIL_EVERY_ACCOUNT`. A connection test passes through the queue but counts as neither, and does not raise `OnEmailSent`: it is a check, not mail.
 - **`email_limit`** — the limits the plugin enforces, so a gamemode splits a mailing by `email_limit(EMAIL_LIMIT_RECIPIENTS)` instead of hardcoding 100.
 - **`email_status`** writes `host:port MODE`, safe to show in a debug command.
 - **`dry_run`** writes each message to `logs/dry-run/` as an `.eml` and sends nothing, for working on a gamemode without spending quota or mailing real players.
