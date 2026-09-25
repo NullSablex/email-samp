@@ -155,6 +155,7 @@ impl EmailPlugin {
                 }
                 // A previous failure on this account should not keep being
                 // reported by `email_errno` once something has gone through.
+                None if !result.is_message => self.accounts.clear_error(result.account_id),
                 None => {
                     self.accounts.clear_error(result.account_id);
                     callback::fire_on_email_sent(
