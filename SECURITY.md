@@ -50,11 +50,12 @@ receives security fixes.
 
 ## Dependencies
 
-SMTP and TLS are compiled into the binary — there is no `libmysqlclient`-style
-system library and no OpenSSL. TLS is [rustls](https://github.com/rustls/rustls)
-with the webpki root bundle; SMTP and MIME are
-[lettre](https://github.com/lettre/lettre), with `default-features = false` so
-the build stays pure Rust.
+SMTP and TLS are compiled into the binary: the plugin loads no system mail or
+TLS library, and no OpenSSL. TLS is [rustls](https://github.com/rustls/rustls),
+verifying against the webpki root bundle that ships inside the binary rather
+than the operating system's store; SMTP and MIME are
+[lettre](https://github.com/lettre/lettre) with `default-features = false`,
+which is what keeps the whole dependency tree pure Rust.
 
 Advisories are tracked by Dependabot, which watches transitive crates as well,
 and by `cargo audit` in CI — on every pull request and again weekly, because an

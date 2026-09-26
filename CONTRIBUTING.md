@@ -39,16 +39,22 @@ cargo test --target i686-unknown-linux-gnu
 python3 .github/scripts/check_pawn_encoding.py
 ```
 
-The examples have to compile clean as well — exit 0 **and** no diagnostics:
+The examples have to compile clean as well — exit 0 **and** no diagnostics.
+They need `include/email_samp.inc`, which `cargo build` generates, plus your
+server's own includes (`a_samp.inc` and friends); `01_configuration.pwn` also
+needs `env_samp.inc`:
 
 ```bash
 for f in examples/*.pwn; do
-  pawncc "$PWD/$f" -i<includes> -o/tmp/$(basename "$f" .pwn).amx
+  out=$(pawncc "$PWD/$f" -i"$PWD/include" -i/path/to/server/qawno/include \
+        -o"/tmp/$(basename "$f" .pwn).amx" 2>&1) || echo "FAILED: $f"
+  echo "$out" | grep -E 'warning|error' && echo "  in $f"
 done
 ```
 
-`-o/dev/null` makes `pawncc` segfault without printing anything, so always
-write a real `.amx` and check the exit code.
+Check the exit code, and never send the output to `/dev/null`: `pawncc`
+segfaults on `-o/dev/null` without printing anything, so a loop that only
+greps for errors reports success for a file that never compiled.
 
 ## Rules that are easy to trip on
 
@@ -77,6 +83,8 @@ src/            the plugin: natives/ is the Pawn surface, the rest is the engine
 include/        the Pawn include (.inc.in is the source; the other two are built)
 examples/       one runnable gamemode per topic
 docs/           the documentation site (English, and Portuguese as *.pt.md)
+tests/          what has to hold from outside the crate, such as the includes
+scripts/        the release builds, for Linux and for Windows
 .github/        CI: build, tests, clippy, audit, CodeQL, encoding guard, docs
 ```
 
