@@ -10,6 +10,8 @@ First release: 34 natives, 2 callbacks and one binary that loads on SA-MP and on
 
 Every path below was exercised against a real open.mp server and a real relay, not only in the test suite: mail delivered over STARTTLS to Gmail, templates rendered, an image embedded and a file attached (both arriving byte-identical), accented text from a Windows-1252 gamemode, `rate_limit` spacing a batch one second apart, and `dry_run` writing `.eml` files without touching the network.
 
+The protections were tested the same way, against relays built to break them: one that does not offer STARTTLS, and one presenting a certificate from an untrusted authority. Both are refused, the second one accepted only once `tls_ca` names the authority. A run with a marked password left no trace of it in the console, in `logs/email.log` or in the `.eml` files.
+
 ### Sending
 
 - **Nothing blocks.** Every native returns at once; mail leaves on a pool of four worker threads and reports back through a Pawn callback on a later tick. Nothing touches the network on the main thread.
@@ -55,11 +57,11 @@ Sends go through a scheduler rather than a queue, and no worker ever sleeps hold
 
 - **Header injection is refused, not sanitised** — CR, LF or NUL in a subject, display name, address, custom header or attachment name is rejected with `EMAIL_ERROR_HEADER_INJECTION`, including in a subject a template rendered. Addresses are parsed by an RFC 5321 parser, never matched with a pattern.
 - **Template values are HTML-escaped** in the `[html]` part, so a nickname containing `<script>` arrives as text. `%r` is the one way to turn that off, for markup the gamemode built itself.
-- **Files stay in the server folder** — attachments, embedded images and templates must resolve inside the working directory (`..` is allowed while the result stays inside), and a symlink or junction anywhere in the path is refused. Checked when the native is called and again right before the worker reads, with the opened file's identity compared to the checked one.
+- **Files stay in the server folder** — attachments, embedded images and templates must resolve inside the working directory (`..` is allowed while the result stays inside), and a symlink or junction anywhere in the path is refused. Checked when the native is called and again right before the worker reads, so swapping a file for a symlink in between does not get past it.
 - **TLS is required, not optional**: STARTTLS must succeed or the send fails. The trust store is the webpki bundle compiled into the binary, so a private CA needs `tls_ca`.
 - **Plaintext credentials take an explicit opt-in** — sending the password unencrypted to a host other than this machine needs `allow_plaintext_auth=1`; a relay on localhost is allowed with a warning.
 - **Caps that turn a leak into an error** — 100 recipients, 50 custom headers and 25 MB of attachments per message, 5000 open drafts, 900 bytes per header value.
-- **Credentials never reach the console.** Passwords, addresses and relay replies go only to `logs/email.log`; configuration errors name the key and what was expected, never the value.
+- **The password reaches no log at all.** It goes to the SMTP client and nowhere else: the types that carry it do not even implement `Debug`. What the console is spared, and `logs/email.log` keeps, is the rest of the detail — a recipient's address, the relay's own reply. A configuration error names the key and what was expected, never the value.
 
 ### Diagnostics
 

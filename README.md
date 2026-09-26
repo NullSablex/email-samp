@@ -151,7 +151,7 @@ PROFILE=dev ./scripts/build-linux.sh  # development build
 - **Template values are HTML-escaped** in the `[html]` part, so a nickname containing `<script>` arrives as text.
 - **Files stay in the server folder.** Attachments, embedded images and templates are resolved and refused if they leave it or go through a symlink, so a path built from player input cannot mail out `server.cfg`.
 - **Plaintext credentials take an explicit opt-in.** Sending the password unencrypted to a host other than this machine is refused unless `allow_plaintext_auth=1`; a relay on localhost is allowed with a warning.
-- **Credentials never reach the console.** Passwords, addresses and relay replies go to `logs/email.log` only; the console gets a short line and an error code.
+- **The password reaches no log at all** — it goes to the SMTP client and nowhere else. What `logs/email.log` keeps, and the console is spared, is the rest of the detail: a recipient's address, the relay's own reply.
 - Keep `smtp.ini` and `.env` out of version control.
 
 ## Contributing

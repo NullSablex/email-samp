@@ -59,7 +59,9 @@ Relay em `localhost`, `127.x` ou `::1` é permitido com aviso: ali a sessão nun
 
 ## Credenciais e logs
 
-Senha, endereço e resposta do relay nunca chegam ao console — o console recebe uma linha curta e um código de erro, e o detalhe vai para `logs/email.log`. Erro de configuração nomeia a chave e o que se esperava, nunca o valor.
+A senha não chega a log nenhum — nem ao console, nem ao `logs/email.log`. Ela vai para o cliente SMTP e mais nada, e os tipos que a carregam não implementam `Debug`, então não dá nem por acidente.
+
+O que a separação entre os dois canais protege é o resto do detalhe: endereço do destinatário e resposta do relay vão para o arquivo, enquanto o console recebe uma linha curta e um código de erro. Erro de configuração nomeia a chave e o que se esperava, nunca o valor.
 
 Mantenha `smtp.ini` e `.env` fora do controle de versão. O `email_status` é seguro num comando de depuração: ele imprime `host:porta MODO` e nenhuma credencial.
 

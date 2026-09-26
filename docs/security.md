@@ -59,7 +59,9 @@ A relay on `localhost`, `127.x` or `::1` is allowed with a warning: there the se
 
 ## Credentials and logs
 
-Passwords, addresses and relay replies never reach the console — the console gets a short line and an error code, and the detail goes to `logs/email.log`. Configuration errors name the key and what was expected, never the value.
+The password reaches no log at all — not the console, not `logs/email.log`. It goes to the SMTP client and nowhere else, and the types that carry it do not implement `Debug`, so it cannot be printed even by accident.
+
+What the split between the two channels protects is the rest of the detail: a recipient's address and the relay's own reply go to the file, while the console gets a short line and an error code. A configuration error names the key and what was expected, never the value.
 
 Keep `smtp.ini` and `.env` out of version control. `email_status` is safe to expose in a debug command: it prints `host:port MODE` and no credentials.
 
