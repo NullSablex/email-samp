@@ -1,57 +1,44 @@
 version: 2
+
+# One entry per area, so each update PR only touches (and only triggers the CI
+# checks of) its own area: the plugin, the workflows and the docs generator.
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: cargo
+    directory: /
     schedule:
-      interval: "weekly"
+      interval: weekly
     open-pull-requests-limit: 5
     commit-message:
-      prefix: "chore(deps)"
-    groups:
-      github-actions:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-  - package-ecosystem: "cargo"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
-    commit-message:
-      prefix: "chore(deps)"
-    # Transitive crates too, not only what Cargo.toml declares. Almost nothing
-    # the plugin ships is in the manifest: rustls arrives through lettre, and
-    # so does most of the lockfile. That default is what let RUSTSEC-2026-0285
-    # sit in Cargo.lock while a fixed rustls had been out for days, until
-    # `cargo audit` happened to be run by hand.
+      prefix: build(deps)
+    # Transitive dependencies too: most of the lockfile arrives through other
+    # crates, and a patched one would otherwise wait for `cargo audit` to fail
+    # an unrelated pull request.
     allow:
-      - dependency-type: "all"
+      - dependency-type: all
     groups:
-      cargo:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-      # One pull request for all the security updates of a week, rather than
-      # one per crate: a group covers version updates unless it says otherwise.
-      cargo-security:
+      plugin:
+        patterns: ["*"]
+        update-types: [minor, patch]
+      plugin-security:
         applies-to: security-updates
-        patterns:
-          - "*"
-  - package-ecosystem: "pip"
-    directory: "/docs"
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: "weekly"
+      interval: weekly
     open-pull-requests-limit: 5
     commit-message:
-      prefix: "chore(deps)"
+      prefix: ci(deps)
     groups:
-      pip:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
+      actions:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: docs(deps)

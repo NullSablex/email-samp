@@ -1,21 +1,11 @@
-# CodeQL advanced setup.
-#
-# Used instead of the *default* setup, which skips a pull request that touches
-# no file of the configured languages. A docs-only PR would then have no
-# analysis to compare against `master`, and a `code_scanning` branch rule
-# reports "configurations not found".
-#
-# With no path filter, both configurations exist on every pull request. The
-# categories (`/language:actions`, `/language:rust`) must match on both sides.
+# CodeQL advanced setup. Reusable: called by ci.yml when Rust or workflow
+# sources change; the weekly run keeps the master baseline current with new
+# queries. Categories stay `/language:actions` and `/language:rust`.
 name: CodeQL
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  workflow_call:
   schedule:
-    # Weekly, to catch newly published queries against unchanged code.
     - cron: '27 4 * * 1'
   workflow_dispatch:
 
@@ -37,6 +27,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3

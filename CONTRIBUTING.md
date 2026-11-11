@@ -82,7 +82,7 @@ greps for errors reports success for a file that never compiled.
 src/            the plugin: natives/ is the Pawn surface, the rest is the engine
 include/        the Pawn include (.inc.in is the source; the other two are built)
 examples/       one runnable gamemode per topic
-docs/           the documentation site (English, and Portuguese as *.pt.md)
+docs/           the documentation site (English, built with Zensical)
 tests/          what has to hold from outside the crate, such as the includes
 scripts/        the release builds, for Linux and for Windows
 .github/        CI: build, tests, clippy, audit, CodeQL, encoding guard, docs
